@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>Gun Runner</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Three.js -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"
+        defer
+    ></script>
+</head>
+
+<body>
+
+    <!-- =========================================================
+         GAME
+    ========================================================== -->
+
+    <main id="game">
+
+        <!-- 3D GAME CANVAS -->
+        <div id="game-container"></div>
+
+
+        <!-- =====================================================
+             TOP HUD
+        ====================================================== -->
+
+        <div id="top-hud">
+
+            <div class="hud-left">
+
+                <div class="hud-card level-card">
+                    <span class="hud-label">LEVEL</span>
+                    <span id="level-value">1</span>
+                </div>
+
+                <div class="hud-card coins-card">
+                    <span class="coin-icon">●</span>
+                    <span id="coin-value">0</span>
+                </div>
+
+            </div>
+
+
+            <div class="hud-center">
+
+                <div id="run-stage">
+                    RUN
+                </div>
+
+                <div id="stage-progress">
+                    <div id="stage-progress-fill"></div>
+                </div>
+
+            </div>
+
+
+            <div class="hud-right">
+
+                <button
+                    id="pause-button"
+                    class="hud-button"
+                    type="button"
+                    aria-label="Pause game"
+                >
+                    II
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             GUN INFORMATION
+        ====================================================== -->
+
+        <section id="gun-hud">
+
+            <div class="gun-title">
+                <span id="gun-name">BASIC BLASTER</span>
+            </div>
+
+            <div class="gun-stats">
+
+                <div class="stat">
+                    <span class="stat-label">DMG</span>
+                    <span id="damage-value">10</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">FIRE</span>
+                    <span id="fire-rate-value">1.0</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">BARRELS</span>
+                    <span id="barrel-value">1</span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">RANGE</span>
+                    <span id="range-value">100</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             BOSS HUD
+        ====================================================== -->
+
+        <section id="boss-hud" class="hidden">
+
+            <div class="boss-name" id="boss-name">
+                BOSS
+            </div>
+
+            <div class="boss-health-container">
+
+                <div
+                    id="boss-health-fill"
+                    class="boss-health-fill"
+                ></div>
+
+            </div>
+
+            <div class="boss-health-text">
+                <span id="boss-health-current">0</span>
+                /
+                <span id="boss-health-max">0</span>
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CENTER MESSAGES
+        ====================================================== -->
+
+        <div id="center-message" class="hidden">
+            <div id="center-message-title"></div>
+            <div id="center-message-subtitle"></div>
+        </div>
+
+
+        <!-- =====================================================
+             GATE PREVIEW
+        ====================================================== -->
+
+        <div id="gate-preview" class="hidden">
+
+            <div id="gate-preview-title">
+                WEAPON MODIFIED
+            </div>
+
+            <div id="gate-preview-content">
+                +1 BARREL
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             POWER-UP DISPLAY
+        ====================================================== -->
+
+        <div id="powerup-container"></div>
+
+
+        <!-- =====================================================
+             MOBILE CONTROLS
+        ====================================================== -->
+
+        <div id="mobile-controls">
+
+            <button
+                id="move-left"
+                class="control-button"
+                type="button"
+                aria-label="Move left"
+            >
+                ◀
+            </button>
+
+            <button
+                id="move-right"
+                class="control-button"
+                type="button"
+                aria-label="Move right"
+            >
+                ▶
+            </button>
+
+        </div>
+
+
+        <!-- =====================================================
+             START SCREEN
+        ====================================================== -->
+
+        <section id="start-screen" class="screen">
+
+            <div class="screen-content">
+
+                <div class="game-logo">
+                    GUN
+                    <span>RUNNER</span>
+                </div>
+
+                <p class="game-tagline">
+                    BUILD YOUR WEAPON.<br>
+                    DEFEAT THE BOSS.
+                </p>
+
+                <button
+                    id="start-button"
+                    class="primary-button"
+                    type="button"
+                >
+                    START RUN
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PAUSE SCREEN
+        ====================================================== -->
+
+        <section id="pause-screen" class="screen hidden">
+
+            <div class="screen-content">
+
+                <h1>PAUSED</h1>
+
+                <button
+                    id="resume-button"
+                    class="primary-button"
+                    type="button"
+                >
+                    RESUME
+                </button>
+
+                <button
+                    id="restart-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    RESTART RUN
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GAME OVER SCREEN
+        ====================================================== -->
+
+        <section id="game-over-screen" class="screen hidden">
+
+            <div class="screen-content">
+
+                <h1>RUN OVER</h1>
+
+                <div class="result-stat">
+                    <span>COINS</span>
+                    <strong id="game-over-coins">0</strong>
+                </div>
+
+                <button
+                    id="game-over-restart"
+                    class="primary-button"
+                    type="button"
+                >
+                    TRY AGAIN
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VICTORY SCREEN
+        ====================================================== -->
+
+        <section id="victory-screen" class="screen hidden">
+
+            <div class="screen-content">
+
+                <div class="victory-title">
+                    BOSS DEFEATED
+                </div>
+
+                <div class="reward-container">
+
+                    <div class="reward-label">
+                        REWARD
+                    </div>
+
+                    <div class="reward-value">
+                        +<span id="victory-coins">0</span>
+                        COINS
+                    </div>
+
+                </div>
+
+                <button
+                    id="next-level-button"
+                    class="primary-button"
+                    type="button"
+                >
+                    NEXT LEVEL
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             LOADING SCREEN
+        ====================================================== -->
+
+        <section id="loading-screen" class="screen">
+
+            <div class="screen-content">
+
+                <div class="loading-title">
+                    LOADING
+                </div>
+
+                <div class="loading-bar">
+                    <div id="loading-fill"></div>
+                </div>
+
+                <div id="loading-text">
+                    Preparing weapon...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         GAME JAVASCRIPT
+         These files will be created next.
+    ========================================================== -->
+
+    <script
+        src="js/data/weapons.js"
+        defer
+    ></script>
+
+    <script
+        src="js/data/upgrades.js"
+        defer
+    ></script>
+
+    <script
+        src="js/data/enemies.js"
+        defer
+    ></script>
+
+    <script
+        src="js/data/bosses.js"
+        defer
+    ></script>
+
+    <script
+        src="js/data/levels.js"
+        defer
+    ></script>
+
+    <script
+        src="js/bullets.js"
+        defer
+    ></script>
+
+    <script
+        src="js/effects.js"
+        defer
+    ></script>
+
+    <script
+        src="js/player.js"
+        defer
+    ></script>
+
+    <script
+        src="js/gun.js"
+        defer
+    ></script>
+
+    <script
+        src="js/upgrades.js"
+        defer
+    ></script>
+
+    <script
+        src="js/gates.js"
+        defer
+    ></script>
+
+    <script
+        src="js/enemies.js"
+        defer
+    ></script>
+
+    <script
+        src="js/boss.js"
+        defer
+    ></script>
+
+    <script
+        src="js/ui.js"
+        defer
+    ></script>
+
+    <script
+        src="js/game.js"
+        defer
+    ></script>
+
+    <script
+        src="js/main.js"
+        defer
+    ></script>
+
+</body>
+</html>
